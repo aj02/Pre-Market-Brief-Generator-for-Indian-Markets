@@ -1,0 +1,41 @@
+{# Bottom scrolling ticker tape. Reads `context` if present. #}
+<div class="ticker-tape" aria-label="Market ticker">
+  <div class="ticker-track">
+    {% set quotes = [] %}
+    {% if context is defined and context %}
+      {% set _ = quotes.extend(context.india_indices) %}
+      {% if context.gift_nifty %}{% set _ = quotes.append(context.gift_nifty) %}{% endif %}
+      {% set _ = quotes.extend(context.sector_indices[:4]) %}
+      {% set _ = quotes.extend(context.commodities[:2]) %}
+      {% set _ = quotes.extend(context.currencies[:2]) %}
+      {% set _ = quotes.extend(context.global_indices[:3]) %}
+      {% set _ = quotes.extend(context.asian_indices[:2]) %}
+    {% endif %}
+
+    {# Repeat track twice for seamless loop. #}
+    {% for pass_ix in [1, 2] %}
+      {% for q in quotes %}
+        {% if q.last is not none %}
+          <span class="ticker-item">
+            <span class="ticker-sym">{{ q.name.upper() }}</span>
+            <span class="ticker-last">{{ '{:,.2f}'.format(q.last) }}</span>
+            {% if q.change_abs is not none %}
+              <span class="ticker-delta {{ 'pos' if q.change_abs >= 0 else 'neg' }}">
+                {{ '▲' if q.change_abs >= 0 else '▼' }}
+                {{ '{:+.2f}'.format(q.change_abs) }}
+              </span>
+            {% endif %}
+          </span>
+          <span class="ticker-sep">|</span>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    {% if not quotes %}
+      <span class="ticker-item ticker-quiet">
+        <span class="ticker-sym">MARKET TICKER</span>
+        <span class="ticker-last">awaiting data</span>
+      </span>
+    {% endif %}
+  </div>
+</div>

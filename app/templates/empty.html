@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if not_found %}Edition not found{% else %}No edition yet{% endif %} &mdash; The Pre-Market Times
+{% endblock %}
+
+{% block content %}
+<article class="empty-state">
+
+  {% if not_found %}
+    <h2 class="empty-headline">No such edition was ever printed.</h2>
+    <p class="empty-sub">
+      The date you requested is not in the archive.
+    </p>
+    <p class="empty-actions">
+      <a class="press-button" href="/">Return to today&rsquo;s front page</a>
+      <a class="press-button-secondary" href="/archive">Browse the archive</a>
+    </p>
+
+  {% else %}
+    <h2 class="empty-headline">Tonight&rsquo;s edition has not gone to press.</h2>
+    <p class="empty-sub">
+      The compositor has not yet set the type for {{ target_date or "today" }}.
+      Trigger the press to generate a fresh brief.
+    </p>
+
+    <div id="press-area">
+      <button
+        class="press-button"
+        hx-post="/api/briefs/generate"
+        hx-target="#press-area"
+        hx-swap="innerHTML">
+        Set the type
+      </button>
+      <p class="press-hint">
+        The press takes a few seconds.
+        When it stops, the page will refresh to the new front page.
+      </p>
+    </div>
+
+    <script>
+      // Watch the in-page marquee for state=done and reload to /
+      // so the user lands on the rendered front page.
+      document.body.addEventListener('htmx:afterSwap', function(evt) {
+        const marquee = document.getElementById('press-marquee');
+        if (!marquee) return;
+        // Poll state directly: marquee text reflects job progress,
+        // but we want a hard signal. Use fetch on the status endpoint.
+        const tick = setInterval(async () => {
+          try {
+            const r = await fetch('/api/briefs/generate/status');
+            const j = await r.json();
+            if (j.state === 'done') { clearInterval(tick); window.location.href = '/'; }
+            if (j.state === 'error') {
+              clearInterval(tick);
+              marquee.classList.add('press-error');
+              marquee.textContent = 'PRESS HALTED · ' + (j.error || 'unknown error');
+            }
+          } catch (e) { /* keep polling */ }
+        }, 2000);
+      });
+    </script>
+  {% endif %}
+
+</article>
+{% endblock %}

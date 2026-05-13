@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}The Pre-Market Times{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500&display=swap">
+
+  <link rel="stylesheet" href="/static/css/newspaper.css">
+  <script src="https://unpkg.com/htmx.org@2.0.3" defer></script>
+</head>
+<body>
+  <main class="paper">
+    {% block masthead %}
+    <header class="masthead">
+      <div class="masthead-tag">ESTABLISHED 2026 &middot; MUMBAI &middot; NSE EDITION</div>
+      <h1 class="masthead-title">THE &nbsp;PRE&#8209;MARKET &nbsp;TIMES</h1>
+      <div class="masthead-rule"></div>
+      <div class="masthead-dateline">
+        {% if edition_label and edition_label.long_date %}
+          <span>{{ edition_label.weekday }}, {{ edition_label.long_date }}</span>
+          <span class="dateline-sep">&middot;</span>
+          <span>{{ edition_label.vol }}</span>
+          <span class="dateline-sep">&middot;</span>
+          <span>Two Annas</span>
+        {% else %}
+          <span>{% block dateline %}{% endblock %}</span>
+        {% endif %}
+      </div>
+    </header>
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="colophon">
+      <span>The Pre-Market Times</span>
+      <span class="dateline-sep">&middot;</span>
+      <a href="/">Today</a>
+      <span class="dateline-sep">&middot;</span>
+      <a href="/archive">Archive</a>
+      <span class="dateline-sep">&middot;</span>
+      <span>Printed locally at 127.0.0.1</span>
+    </footer>
+  </main>
+
+  {% include "partials/ticker.html" ignore missing %}
+
+  <script src="/static/js/ticker.js" defer></script>
+</body>
+</html>

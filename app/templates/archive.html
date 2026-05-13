@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Archive &mdash; The Pre-Market Times{% endblock %}
+
+{% block content %}
+<article class="archive">
+  <h2 class="archive-title">The Archive</h2>
+  <p class="archive-sub">Past editions of The Pre-Market Times. Most recent first.</p>
+  <hr class="major-rule">
+
+  {% if items %}
+    <ol class="archive-list">
+      {% for it in items %}
+      <li class="archive-entry">
+        <div class="archive-date">
+          {{ it.edition_label.weekday }}, {{ it.edition_label.long_date }}
+          <span class="dateline-sep">&middot;</span>
+          <span class="archive-vol">{{ it.edition_label.vol }}</span>
+        </div>
+        <a class="archive-headline" href="/briefs/{{ it.target_date }}">
+          {{ it.headline }}
+        </a>
+        <hr class="minor-rule">
+      </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="archive-empty">No prior editions have gone to press.</p>
+  {% endif %}
+</article>
+{% endblock %}

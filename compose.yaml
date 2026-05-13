@@ -1,0 +1,45 @@
+services:
+  app:
+    build: ./app
+    ports:
+      - "127.0.0.1:18450:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://premarket:premarket@db:5432/premarket
+      REDIS_URL: redis://cache:6379/0
+      DEEPINFRA_API_KEY: ${DEEPINFRA_API_KEY:-}
+      DEEPINFRA_BASE_URL: ${DEEPINFRA_BASE_URL:-https://api.deepinfra.com/v1/openai}
+      LLM_MODEL: ${LLM_MODEL:-meta-llama/Meta-Llama-3.1-70B-Instruct}
+      TIMEZONE: ${TIMEZONE:-Asia/Kolkata}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "127.0.0.1:18452:5432"
+    environment:
+      POSTGRES_USER: premarket
+      POSTGRES_PASSWORD: premarket
+      POSTGRES_DB: premarket
+    volumes:
+      - premarket_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U premarket"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:18453:6379"
+    volumes:
+      - premarket_redis:/data
+
+volumes:
+  premarket_pg:
+  premarket_redis:

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ sections.headline }} &mdash; The Pre-Market Times{% endblock %}
+
+{% block content %}
+<article class="front-page">
+
+  <div class="front-page-grid">
+
+    <section class="lede">
+      <h2 class="lede-headline">{{ sections.headline }}</h2>
+      <p class="lede-subhead">{{ sections.subhead }}</p>
+      <p class="byline">By the Editorial Desk &middot; {{ generated_at_local.strftime('%H:%M') }} IST</p>
+
+      <div class="body-prose">
+        <p class="drop-cap">{{ sections.driving_narrative }}</p>
+
+        <h3 class="section-label"><span>Global Setup</span></h3>
+        <p>{{ sections.global_setup }}</p>
+
+        <h3 class="section-label"><span>India Setup</span></h3>
+        <p>{{ sections.india_setup }}</p>
+
+        {% if context.sector_indices %}
+        <h3 class="section-label"><span>Sector Tape</span></h3>
+        <table class="sector-tape">
+          <tbody>
+            {% for q in context.sector_indices if q.last is not none %}
+            <tr>
+              <td class="sector-name">{{ q.name }}</td>
+              <td class="sector-last">{{ '{:,.2f}'.format(q.last) }}</td>
+              <td class="sector-delta {{ 'pos' if q.change_abs and q.change_abs >= 0 else 'neg' }}">
+                {% if q.change_pct is not none %}{{ '{:+.2f}%'.format(q.change_pct) }}{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        <h3 class="section-label"><span>Flows &mdash; FII &amp; DII</span></h3>
+        <p>{{ sections.fii_dii_commentary }}</p>
+
+        <h3 class="section-label"><span>Expected Open</span></h3>
+        <p>
+          <strong>{{ sections.expected_open.direction }}</strong>,
+          {{ sections.expected_open.magnitude }}.
+          Bias: <em>{{ sections.expected_open.bias }}</em>.
+        </p>
+      </div>
+    </section>
+
+    {% include "partials/todays_numbers.html" %}
+
+  </div>
+
+  <hr class="major-rule">
+
+  <div class="two-up">
+    <section class="stocks-in-play">
+      <h3 class="column-title">Stocks In Play</h3>
+      <ul class="ornament-list">
+        {% for s in sections.stocks_in_focus %}
+        <li>
+          <span class="ticker-name">{{ s.ticker }}</span>
+          <span class="ticker-dash">&mdash;</span>
+          <span class="ticker-rationale">{{ s.rationale }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <hr class="minor-rule">
+
+      <h3 class="column-title">Risk Watch</h3>
+      <ul class="ornament-list">
+        {% for r in sections.key_risks %}
+        <li><span class="ticker-rationale">{{ r }}</span></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="editorial">
+      <h3 class="column-title">The Editorial</h3>
+      <p class="editorial-body">{{ sections.trading_stance }}</p>
+      <p class="editorial-signoff">&mdash; The Desk</p>
+    </section>
+  </div>
+
+  {% if context.fetch_warnings %}
+  <details class="fetch-warnings">
+    <summary>Press notes &mdash; data warnings ({{ context.fetch_warnings|length }})</summary>
+    <ul>
+      {% for w in context.fetch_warnings %}<li>{{ w }}</li>{% endfor %}
+    </ul>
+  </details>
+  {% endif %}
+
+  <p class="model-credit">
+    Set by <span class="model-name">{{ model_used }}</span>.
+    Edition for {{ target_date }}.
+  </p>
+
+</article>
+{% endblock %}

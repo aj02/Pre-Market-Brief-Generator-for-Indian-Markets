@@ -1,0 +1,55 @@
+{# Right-hand sidebar: "Today's Numbers". Receives `context` from brief.html. #}
+{% macro qline(q, force_label=None) -%}
+  {% if q and q.last is not none %}
+    <div class="number-block">
+      <div class="number-label">{{ force_label or q.name }}</div>
+      <div class="number-value">{{ '{:,.2f}'.format(q.last) }}</div>
+      {% if q.change_abs is not none and q.change_pct is not none %}
+        <div class="number-change {{ 'pos' if q.change_abs >= 0 else 'neg' }}">
+          {{ '{:+.2f}'.format(q.change_abs) }} ({{ '{:+.2f}'.format(q.change_pct) }}%)
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
+<aside class="todays-numbers">
+  <div class="numbers-title">Today&rsquo;s Numbers</div>
+  <hr class="minor-rule">
+
+  {% for q in context.india_indices %}{{ qline(q) }}{% endfor %}
+
+  {% if context.gift_nifty %}{{ qline(context.gift_nifty) }}{% endif %}
+
+  {% if context.commodities %}
+    <div class="numbers-subhead">Commodities</div>
+    {% for q in context.commodities[:2] %}{{ qline(q) }}{% endfor %}
+  {% endif %}
+
+  {% if context.currencies %}
+    <div class="numbers-subhead">Currencies</div>
+    {% for q in context.currencies[:2] %}{{ qline(q) }}{% endfor %}
+  {% endif %}
+
+  {% if context.fii_dii %}
+    <div class="numbers-subhead">FII / DII (Rs cr)</div>
+    {% if context.fii_dii.fii_net is not none %}
+      <div class="number-block">
+        <div class="number-label">FII Net</div>
+        <div class="number-value">{{ '{:,.2f}'.format(context.fii_dii.fii_net) }}</div>
+        <div class="number-change {{ 'pos' if context.fii_dii.fii_net >= 0 else 'neg' }}">
+          {{ 'Buy' if context.fii_dii.fii_net >= 0 else 'Sell' }}
+        </div>
+      </div>
+    {% endif %}
+    {% if context.fii_dii.dii_net is not none %}
+      <div class="number-block">
+        <div class="number-label">DII Net</div>
+        <div class="number-value">{{ '{:,.2f}'.format(context.fii_dii.dii_net) }}</div>
+        <div class="number-change {{ 'pos' if context.fii_dii.dii_net >= 0 else 'neg' }}">
+          {{ 'Buy' if context.fii_dii.dii_net >= 0 else 'Sell' }}
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+</aside>
