@@ -6,14 +6,17 @@ A Dockerized FastAPI web app that generates and renders a daily pre-market tradi
 
 ## Screenshots
 
-> Run `docker compose up --build` and take screenshots of `http://127.0.0.1:18450` for this section. Suggested shots:
->
-> - Front page (`/`)
-> - Archive index (`/archive`)
-> - Empty state (clear the DB, set `DEMO_MODE=false`, hit `/`)
-> - Generating state (after clicking *Set the type*)
->
-> Place PNGs under `samples/` and link them from this section.
+Front page (`/`):
+
+![Front page](samples/home.png)
+
+Archive index (`/archive`):
+
+![Archive](samples/archive.png)
+
+Empty state (`DEMO_MODE=false`, no brief for today):
+
+![Empty state](samples/empty.png)
 
 ---
 

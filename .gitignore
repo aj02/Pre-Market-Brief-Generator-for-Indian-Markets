@@ -13,8 +13,6 @@ htmlcov/
 .DS_Store
 Thumbs.db
 *.log
-samples/*.png
-!samples/.gitkeep
 .idea/
 .vscode/
 .history/
